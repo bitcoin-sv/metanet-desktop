@@ -212,7 +212,7 @@ const ProtocolPermissionHandler: React.FC<{
           <Stack direction="row" spacing={1} alignItems="center">
             <Typography variant="body1" fontWeight="bold">App:</Typography>
             <AppChip
-              size={2.5}
+              size={2}
               showDomain
               label={currentPerm.originator || 'unknown'}
               clickable={false}

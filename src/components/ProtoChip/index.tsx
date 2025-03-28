@@ -1,19 +1,14 @@
-import { useState } from 'react'
-import { Stack, Chip, Badge, Avatar, Tooltip } from '@mui/material'
-import CloseIcon from '@mui/icons-material/Close'
+import { useState, useEffect } from 'react'
+import { Chip, Badge, Tooltip, Avatar, Stack } from '@mui/material'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
-// import { ProtoMap } from 'babbage-protomap'
-// import { Img } from 'uhrp-react'
+import CloseIcon from '@mui/icons-material/Close'
+import DataObject from '@mui/icons-material/DataObject'
 import makeStyles from '@mui/styles/makeStyles'
 import { useTheme } from '@mui/styles'
 import style from './style'
-import { generateDefaultIcon } from '../../constants/popularApps'
-// import confederacyHost from '../../utils/confederacyHost'
+import { deterministicImage } from '../../utils/deterministicImage'
 import CounterpartyChip from '../CounterpartyChip/index'
-import DataObject from '@mui/icons-material/DataObject'
-import { toast } from 'react-toastify'
 import PlaceholderAvatar from '../PlaceholderAvatar'
-// import { SettingsContext } from '../../context/SettingsContext'
 
 const useStyles = makeStyles(style as any, {
   name: 'ProtoChip'
@@ -47,7 +42,7 @@ const ProtoChip: React.FC<ProtoChipProps> = ({
   size = 1.3,
   onClick,
   expires,
-  onCloseClick = () => { },
+  onCloseClick,
   canRevoke = true,
   description,
   iconURL,
@@ -55,36 +50,45 @@ const ProtoChip: React.FC<ProtoChipProps> = ({
 }) => {
   const classes = useStyles()
   const theme: any = useTheme()
-  // const { settings } = useContext(SettingsContext)
 
-  // Initialize ProtoMap
-  // const protomap = new ProtoMap()
-  // protomap.config.confederacyHost = confederacyHost()
-
-  const [protocolName,
-    // setProtocolName
-  ] = useState(protocolID)
-  const [iconURLState,
-    // setIconURL
-  ] = useState(
-    iconURL || generateDefaultIcon(protocolID)
-  )
-  const [imageError, setImageError] = useState(false)
-  const [descriptionState,
-    // setDescription
-  ] = useState(
-    description || 'Protocol description not found.'
-  )
-  const [documentationURL,
-    // setDocumentationURL
-  ] = useState('https://projectbabbage.com')
-
-  // Handle image loading errors
-  const handleImageError = () => {
-    setImageError(true);
+  const navToProtocolDocumentation = (e: any) => {
+    if (clickable) {
+      if (typeof onClick === 'function') {
+        onClick(e)
+      } else {
+        e.stopPropagation()
+        history.push(`/dashboard/protocol/${encodeURIComponent(protocolID)}`)
+      }
+    }
   }
 
-  const chipStyle = theme.templates.chip({ size, backgroundColor })
+  // Validate protocolID before hooks
+  if (typeof protocolID !== 'string') {
+    console.error('ProtoChip: protocolID must be a string. Received:', protocolID)
+    // Don't return null here to avoid conditional hook calls
+  }
+
+  const [protocolName, setProtocolName] = useState(protocolID)
+  const [iconURLState, setIconURLState] = useState(iconURL || deterministicImage(protocolID))
+  const [imageError, setImageError] = useState(false)
+  const [documentationURL] = useState('https://projectbabbage.com')
+
+  useEffect(() => {
+    if (typeof protocolID === 'string') {
+      // Update state if props change
+      setProtocolName(protocolID)
+      setIconURLState(iconURL || deterministicImage(protocolID))
+    }
+  }, [protocolID, iconURL])
+
+  // Handle image loading events
+  const handleImageLoad = () => {
+    setImageError(false)
+  }
+
+  const handleImageError = () => {
+    setImageError(true)
+  }
 
   const securityLevelExplainer = (securityLevel: number) => {
     switch (securityLevel) {
@@ -99,73 +103,80 @@ const ProtoChip: React.FC<ProtoChipProps> = ({
     }
   }
 
+  // If protocolID is invalid, return null after hooks are defined
   if (typeof protocolID !== 'string') {
-    console.log('ProtoChip: protocolID must be a string. Received:', protocolID)
     return null
   }
 
   return (
-    <div className={classes.chipContainer}>
+    <Stack direction="row" alignItems="center" spacing={3}>
       <Chip
-        style={chipStyle}
+        style={theme.templates.chip({ size, backgroundColor })}
         avatar={
           <Badge
             overlap="circular"
             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             badgeContent={
-              <Avatar
-                sx={{
-                  width: 22,
-                  height: 22,
-                  bgcolor: theme.palette.primary.main,
-                  color: theme.palette.primary.contrastText
+              <Tooltip
+                arrow
+                title="Protocol (click to learn more)"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  window.open(documentationURL, '_blank')
                 }}
               >
-                <DataObject fontSize="small" />
-              </Avatar>
+                <Avatar
+                  sx={{
+                    width: 22,
+                    height: 22,
+                    bgcolor: theme.palette.primary.main,
+                    color: theme.palette.primary.contrastText
+                  }}
+                >
+                  <DataObject fontSize="small" />
+                </Avatar>
+              </Tooltip>
             }
           >
             {!imageError ? (
               <Avatar
                 src={iconURLState}
                 alt={protocolName}
-                sx={{ width: size * 32, height: size * 32 }}
+                sx={{ 
+                  width: size * 32, 
+                  height: size * 32,
+                  borderRadius: '4px',
+                  marginRight: '0.5em'
+                }}
+                onLoad={handleImageLoad}
                 onError={handleImageError}
               />
             ) : (
               <PlaceholderAvatar
                 name={protocolName}
                 size={size * 32}
+                variant="square"
+                sx={{ borderRadius: '4px', marginRight: '0.5em' }}
               />
             )}
           </Badge>
         }
-        label={
-          <Stack direction="row" spacing={1} alignItems="center">
-            <div className={classes.chipLabel}>
-              {protocolName}
-              {counterparty && (
-                <CounterpartyChip
-                  size={size * 0.8}
-                  counterparty={counterparty}
-                />
-              )}
-            </div>
-          </Stack>
-        }
-        onClick={clickable ? onClick : undefined}
+        label={protocolName}
+        onClick={navToProtocolDocumentation}
         onDelete={canRevoke ? onCloseClick : undefined}
         deleteIcon={canRevoke ? <CloseIcon /> : undefined}
       />
+      {counterparty && <CounterpartyChip
+        size={size * 0.8}
+        counterparty={counterparty}
+      />}
       {expires && (
-        <div className={classes.expires}>
-          Expires {expires}
-        </div>
+        <Stack>{expires}</Stack>
       )}
-      <div className={classes.securityLevel}>
+      <Stack>
         {securityLevelExplainer(securityLevel)}
-      </div>
-    </div>
+      </Stack>
+    </Stack>
   )
 }
 
