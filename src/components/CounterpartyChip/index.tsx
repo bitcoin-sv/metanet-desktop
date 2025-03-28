@@ -8,6 +8,7 @@ import makeStyles from '@mui/styles/makeStyles'
 import CloseIcon from '@mui/icons-material/Close'
 import { useTheme } from '@mui/styles'
 import style from './style'
+import PlaceholderAvatar from '../PlaceholderAvatar'
 // import confederacyHost from '../../utils/confederacyHost'
 // import { discoverByIdentityKey, getPublicKey } from '@babbage/sdk-ts'
 // import { defaultIdentity, parseIdentity } from 'identinator'
@@ -50,42 +51,18 @@ const CounterpartyChip: React.FC<CounterpartyChipProps> = ({
     badgeIconURL: 'https://projectbabbage.com/favicon.ico',
     avatarURL: 'https://projectbabbage.com/favicon.ico'
   })
+  
+  const [avatarError, setAvatarError] = useState(false)
+  const [badgeError, setBadgeError] = useState(false)
 
-  // useEffect(() => {
-  //   // Function to load and potentially update identity for a specific counterparty
-  //   const loadIdentity = async (counterpartyKey) => {
-  //     // Initial load from local storage for a specific counterparty
-  //     const cachedIdentity = window.localStorage.getItem(`signiaIdentity_${counterpartyKey}`)
-  //     if (cachedIdentity) {
-  //       setSigniaIdentity(JSON.parse(cachedIdentity))
-  //     }
-
-  //     try {
-  //       // Resolve the counterparty key for 'self' or 'anyone'
-  //       if (counterpartyKey === 'self') {
-  //         counterpartyKey = await getPublicKey({ identityKey: true })
-  //       } else if (counterpartyKey === 'anyone') {
-  //         counterpartyKey = '0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798'
-  //       }
-
-  //       // Fetch the latest identity info from the server
-  //       const results = await discoverByIdentityKey({ identityKey: counterpartyKey })
-  //       if (results && results.length > 0) {
-  //         const resolvedIdentity = results[0]
-  //         const parsedIdentity = parseIdentity(resolvedIdentity)
-  //         // Update component state and cache in local storage
-  //         setSigniaIdentity(parsedIdentity)
-  //         window.localStorage.setItem(`signiaIdentity_${counterpartyKey}`, JSON.stringify(parsedIdentity))
-  //       }
-  //     } catch (e) {
-  //       window.Bugsnag.notify(e)
-  //       console.error(e)
-  //     }
-  //   }
-
-  //   // Execute the loading function with the initial counterparty
-  //   loadIdentity(counterparty)
-  // }, [counterparty])
+  // Handle image loading errors
+  const handleAvatarError = () => {
+    setAvatarError(true)
+  }
+  
+  const handleBadgeError = () => {
+    setBadgeError(true)
+  }
 
   return (
     <div className={classes.chipContainer}>
@@ -106,29 +83,51 @@ const CounterpartyChip: React.FC<CounterpartyChipProps> = ({
           </div>
         }
         icon={
-
           <Tooltip title={signiaIdentity.badgeLabel} placement='right'>
             <Badge
               overlap='circular'
               anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
               badgeContent={
-                <Icon style={{ width: '20px', height: '20px', backgroundColor: 'white', borderRadius: '20%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <img // TODO (add UHRP)
-                    style={{ width: '95%', height: '95%', objectFit: 'cover', borderRadius: '20%' }}
-                    src={signiaIdentity.badgeIconURL}
-                    // confederacyHost={confederacyHost()}
-                    loading={undefined}
-                  />
-                </Icon>
+                !badgeError ? (
+                  <Icon style={{ width: '20px', height: '20px', backgroundColor: 'white', borderRadius: '20%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <img
+                      style={{ width: '95%', height: '95%', objectFit: 'cover', borderRadius: '20%' }}
+                      src={signiaIdentity.badgeIconURL}
+                      alt={`${signiaIdentity.badgeLabel} badge`}
+                      onError={handleBadgeError}
+                      loading="lazy"
+                    />
+                  </Icon>
+                ) : (
+                  <Avatar 
+                    sx={{ 
+                      width: '20px', 
+                      height: '20px', 
+                      backgroundColor: 'rgba(0, 0, 0, 0.5)', 
+                      fontSize: '10px' 
+                    }}
+                  >
+                    ID
+                  </Avatar>
+                )
               }
             >
-              <Avatar alt={signiaIdentity.name} sx={{ width: '2.5em', height: '2.5em' }}>
-                <img // TODO: Add UHRP back
-                  src={signiaIdentity.avatarURL}
-                  className={classes.table_picture}
-                // confederacyHost={confederacyHost()}
+              {!avatarError ? (
+                <Avatar alt={signiaIdentity.name} sx={{ width: '2.5em', height: '2.5em' }}>
+                  <img
+                    src={signiaIdentity.avatarURL}
+                    alt={signiaIdentity.name}
+                    className={classes.table_picture}
+                    onError={handleAvatarError}
+                    loading="lazy"
+                  />
+                </Avatar>
+              ) : (
+                <PlaceholderAvatar
+                  name={signiaIdentity.name !== 'Unknown' ? signiaIdentity.name : counterparty.substring(0, 10)}
+                  size={2.5 * 16}
                 />
-              </Avatar>
+              )}
             </Badge>
           </Tooltip>
         }

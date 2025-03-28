@@ -1,4 +1,4 @@
-export const DEFAULT_APP_ICON = 'https://projectbabbage.com/favicon.ico'
+export const DEFAULT_APP_ICON = 'https://bsvblockchain.org/favicon.ico'
 
 export default [
   {

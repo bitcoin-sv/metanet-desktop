@@ -12,6 +12,7 @@ import { DEFAULT_APP_ICON } from '../../constants/popularApps'
 import CounterpartyChip from '../CounterpartyChip/index'
 import DataObject from '@mui/icons-material/DataObject'
 import { toast } from 'react-toastify'
+import PlaceholderAvatar from '../PlaceholderAvatar'
 // import { SettingsContext } from '../../context/SettingsContext'
 
 const useStyles = makeStyles(style as any, {
@@ -68,6 +69,7 @@ const ProtoChip: React.FC<ProtoChipProps> = ({
   ] = useState(
     iconURL || DEFAULT_APP_ICON
   )
+  const [imageError, setImageError] = useState(false)
   const [descriptionState,
     // setDescription
   ] = useState(
@@ -77,59 +79,12 @@ const ProtoChip: React.FC<ProtoChipProps> = ({
     // setDocumentationURL
   ] = useState('https://projectbabbage.com')
 
-  // useEffect(() => {
-  //   const cacheKey = `protocolInfo_${protocolID}_${securityLevel}`
-
-  //   const fetchAndCacheData = async () => {
-  //     // Try to load data from cache
-  //     const cachedData = window.localStorage.getItem(cacheKey)
-  //     if (cachedData) {
-  //       const { name, iconURL, description, documentationURL } = JSON.parse(cachedData)
-  //       setProtocolName(name)
-  //       setIconURL(iconURL)
-  //       setDescription(description)
-  //       setDocumentationURL(documentationURL)
-  //     }
-  //     try {
-  //       // Resolve a Protocol info from id and security level
-  //       const certifiers = settings.trustedEntities.map(x => x.publicKey)
-  //       const results = await protomap.resolveProtocol(certifiers, securityLevel, protocolID)
-
-  //       // Compute the most trusted of the results
-  //       let mostTrustedIndex = 0
-  //       let maxTrustPoints = 0
-  //       for (let i = 0; i < results.length; i++) {
-  //         const resultTrustLevel = settings.trustedEntities.find(x => x.publicKey === results[i].registryOperator)?.trust || 0
-  //         if (resultTrustLevel > maxTrustPoints) {
-  //           mostTrustedIndex = i
-  //           maxTrustPoints = resultTrustLevel
-  //         }
-  //       }
-  //       const trusted = results[mostTrustedIndex]
-
-  //       // Update state and cache the results
-  //       setProtocolName(trusted.name)
-  //       setIconURL(trusted.iconURL)
-  //       setDescription(trusted.description)
-  //       setDocumentationURL(trusted.documentationURL)
-
-  //       // Store data in local storage
-  //       window.localStorage.setItem(cacheKey, JSON.stringify({
-  //         name: trusted.name,
-  //         iconURL: trusted.iconURL,
-  //         description: trusted.description,
-  //         documentationURL: trusted.documentationURL
-  //       }))
-  //     } catch (error) {
-  //       console.error(error)
-  //     }
-  //   }
-
-  //   fetchAndCacheData()
-  // }, [protocolID, securityLevel, settings])
+  // Handle image loading errors
+  const handleImageError = () => {
+    setImageError(true);
+  }
 
   const chipStyle = theme.templates.chip({ size, backgroundColor })
-
 
   if (typeof protocolID !== 'string') {
     console.log('ProtoChip: protocolID must be a string. Received:', protocolID)
@@ -157,11 +112,19 @@ const ProtoChip: React.FC<ProtoChipProps> = ({
               </Avatar>
             }
           >
-            <Avatar
-              src={iconURLState}
-              alt={protocolName}
-              sx={{ width: size * 32, height: size * 32 }}
-            />
+            {!imageError ? (
+              <Avatar
+                src={iconURLState}
+                alt={protocolName}
+                sx={{ width: size * 32, height: size * 32 }}
+                onError={handleImageError}
+              />
+            ) : (
+              <PlaceholderAvatar
+                name={protocolName}
+                size={size * 32}
+              />
+            )}
           </Badge>
         }
         label={
