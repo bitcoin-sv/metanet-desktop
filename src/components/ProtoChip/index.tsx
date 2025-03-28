@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Grid, Chip, Badge, Avatar, Tooltip } from '@mui/material'
+import { Stack, Chip, Badge, Avatar, Tooltip } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 // import { ProtoMap } from 'babbage-protomap'
@@ -141,19 +141,17 @@ const ProtoChip: React.FC<ProtoChipProps> = ({
           </Badge>
         }
         label={
-          <Grid container spacing={1} alignItems="center">
-            <Grid item xs>
-              <div className={classes.chipLabel}>
-                {protocolName}
-                {counterparty && (
-                  <CounterpartyChip
-                    size={size * 0.8}
-                    counterparty={counterparty}
-                  />
-                )}
-              </div>
-            </Grid>
-          </Grid>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <div className={classes.chipLabel}>
+              {protocolName}
+              {counterparty && (
+                <CounterpartyChip
+                  size={size * 0.8}
+                  counterparty={counterparty}
+                />
+              )}
+            </div>
+          </Stack>
         }
         onClick={clickable ? onClick : undefined}
         onDelete={canRevoke ? onCloseClick : undefined}

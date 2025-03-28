@@ -154,19 +154,18 @@ const ProtocolPermissionHandler: React.FC<{
     },
     renewal: {
       title: 'Protocol Access Renewal',
-      description: 'An app is requesting to renew its previous access to a protocol using your information.',
+      description: 'An app is requesting to renew its previous access to a protocol.',
       color: theme.approvals.renewal,
       icon: <CachedIcon fontSize="medium" />
     },
     basket: {
       title: 'Basket Access Request',
-      description: 'An app is requesting access to a basket of your data to perform a specific task.',
+      description: 'An app wants to view your tokens within a specific basket.',
       color: theme.approvals.basket,
       icon: <ShoppingBasketIcon fontSize="medium" />
     },
     protocol: {
       title: 'Protocol Access Request',
-      description: 'An app is requesting to talk in a specific language (protocol) using your information.',
       color: theme.approvals.protocol,
       icon: <CodeIcon fontSize="medium" />
     }
@@ -198,88 +197,39 @@ const ProtocolPermissionHandler: React.FC<{
     <CustomDialog
       open={open}
       title={getPermissionTypeDoc().title}
+      color={getPermissionTypeDoc().color}
+      icon={getPermissionTypeDoc().icon}
     >
-      {/* Top section with icon and general description */}
-      <Paper 
-        elevation={0}
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 2,
-          p: 2,
-          mb: 2,
-          bgcolor: 'rgba(0, 0, 0, 0.02)'
-        }}
-      >
-        {getIconAvatar()}
-        <div>
-          <Typography variant="subtitle1" fontWeight="bold" color={getPermissionTypeDoc().color}>
-            {currentPerm.type?.toUpperCase() || 'PROTOCOL'} ACCESS
-          </Typography>
-          <Typography variant="body2" color="textSecondary">
-            {getPermissionTypeDoc().description}
-          </Typography>
-        </div>
-      </Paper>
+      
 
       <DialogContent>
-        {/* Protocol description section - now prominently displayed at the top */}
-        {currentPerm.protocolID && (
-          <Paper 
-            elevation={0}
-            sx={{
-              p: 2,
-              mb: 3,
-              bgcolor: 'rgba(0, 0, 0, 0.03)',
-              borderLeft: `4px solid ${deterministicColor(currentPerm.protocolID)}`,
-            }}
-          >
-            <Typography variant="h6" gutterBottom>
-              {currentPerm.protocolID}
-            </Typography>
-            <Typography variant="body1">
-              {currentPerm.description || "No description provided for this protocol."}
-            </Typography>
-          </Paper>
-        )}
-
         {/* Main content with app and protocol details */}
         <Stack spacing={3}>
           {/* App section */}
-          <Stack>
-            <Grid container spacing={2} alignItems="center">
-              <Grid flex="auto">
-                <Typography variant="body1" fontWeight="bold">App:</Typography>
-              </Grid>
-              <Grid flex={1}>
-                {currentPerm.originator && 
-                  <AppChip
-                    size={2.5}
-                    showDomain
-                    label={currentPerm.originator}
-                    clickable={false}
-                  />
-                }
-              </Grid>
-            </Grid>
+          {currentPerm.description && <Stack>
+            {currentPerm.description}
+          </Stack>}
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Typography variant="body1" fontWeight="bold">App:</Typography>
+            <AppChip
+              size={2.5}
+              showDomain
+              label={currentPerm.originator || 'unknown'}
+              clickable={false}
+            />
+            <Typography variant="body1" fontWeight="bold">
+              wants to use
+            </Typography>
           </Stack>
-
+        
           <Divider />
-
-          {/* Protocol section */}
-          <Stack>
-            <Grid container spacing={2} alignItems="center">
-              <Grid flex="auto">
-                <Typography variant="body1" fontWeight="bold">Protocol:</Typography>
-              </Grid>
-              <Grid flex={1}>
-                <ProtoChip
-                  securityLevel={currentPerm.protocolSecurityLevel}
-                  protocolID={currentPerm.protocolID}
-                  counterparty={currentPerm.counterparty}
-                />
-              </Grid>
-            </Grid>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Typography variant="body1" fontWeight="bold">Protocol:</Typography>
+            <ProtoChip
+              securityLevel={currentPerm.protocolSecurityLevel}
+              protocolID={currentPerm.protocolID}
+              counterparty={currentPerm.counterparty}
+            />
           </Stack>
         </Stack>
       </DialogContent>
