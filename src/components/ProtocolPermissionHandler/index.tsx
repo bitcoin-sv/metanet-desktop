@@ -176,11 +176,6 @@ const ProtocolPermissionHandler: React.FC<{
     return permissionTypeDocs[type];
   };
 
-  const deterministicColor = (id: string) => {
-    const hash = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    return `hsl(${hash % 360}, 100%, 50%)`;
-  };
-
   const getIconAvatar = () => (
     <Avatar 
       sx={{ 

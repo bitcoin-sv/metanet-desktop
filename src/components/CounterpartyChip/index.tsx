@@ -9,6 +9,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import { useTheme } from '@mui/styles'
 import style from './style'
 import PlaceholderAvatar from '../PlaceholderAvatar'
+import { generateDefaultIcon } from '../../constants/popularApps'
 // import confederacyHost from '../../utils/confederacyHost'
 // import { discoverByIdentityKey, getPublicKey } from '@babbage/sdk-ts'
 // import { defaultIdentity, parseIdentity } from 'identinator'
@@ -49,7 +50,7 @@ const CounterpartyChip: React.FC<CounterpartyChipProps> = ({
     badgeLabel: 'Unknown',
     abbreviatedKey: counterparty.substring(0, 10),
     badgeIconURL: 'https://projectbabbage.com/favicon.ico',
-    avatarURL: 'https://projectbabbage.com/favicon.ico'
+    avatarURL: generateDefaultIcon(counterparty)
   })
   
   const [avatarError, setAvatarError] = useState(false)

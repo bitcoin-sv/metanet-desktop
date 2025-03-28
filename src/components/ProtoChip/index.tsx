@@ -7,7 +7,7 @@ import { withRouter, RouteComponentProps } from 'react-router-dom'
 import makeStyles from '@mui/styles/makeStyles'
 import { useTheme } from '@mui/styles'
 import style from './style'
-import { DEFAULT_APP_ICON } from '../../constants/popularApps'
+import { generateDefaultIcon } from '../../constants/popularApps'
 // import confederacyHost from '../../utils/confederacyHost'
 import CounterpartyChip from '../CounterpartyChip/index'
 import DataObject from '@mui/icons-material/DataObject'
@@ -67,7 +67,7 @@ const ProtoChip: React.FC<ProtoChipProps> = ({
   const [iconURLState,
     // setIconURL
   ] = useState(
-    iconURL || DEFAULT_APP_ICON
+    iconURL || generateDefaultIcon(protocolID)
   )
   const [imageError, setImageError] = useState(false)
   const [descriptionState,

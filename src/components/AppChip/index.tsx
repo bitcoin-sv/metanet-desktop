@@ -10,7 +10,7 @@ import Memory from '@mui/icons-material/Memory'
 import makeStyles from '@mui/styles/makeStyles'
 import CloseIcon from '@mui/icons-material/Close'
 import style from './style'
-import { DEFAULT_APP_ICON } from '../../constants/popularApps'
+import { generateDefaultIcon } from '../../constants/popularApps'
 import PlaceholderAvatar from '../PlaceholderAvatar'
 
 const useStyles = makeStyles(style, {
@@ -54,7 +54,7 @@ const AppChip: React.FC<AppChipProps> = ({
     label = label.substring(7)
   }
   const [parsedLabel, setParsedLabel] = useState(label)
-  const [appIconImageUrl, setAppIconImageUrl] = useState(DEFAULT_APP_ICON)
+  const [appIconImageUrl, setAppIconImageUrl] = useState(generateDefaultIcon(label))
   const [imageError, setImageError] = useState(false)
 
   useEffect(() => {
