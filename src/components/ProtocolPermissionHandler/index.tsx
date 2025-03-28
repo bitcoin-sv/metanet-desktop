@@ -1,9 +1,9 @@
 import { Dispatch, SetStateAction, useState, useEffect, useContext } from 'react'
-import { DialogContent, DialogContentText, DialogActions, Button, Paper, Typography, Divider } from '@mui/material'
+import { DialogContent, DialogContentText, DialogActions, Button, Paper, Typography, Divider, Box } from '@mui/material'
 import CustomDialog from '../CustomDialog/index'
 import { WalletContext } from '../../UserInterface'
 import AppChip from '../AppChip/index'
-import ProtoChip from '../ProtoChip/index.tsx'
+import ProtoChip from '../ProtoChip/index'
 import { PermissionEventHandler, PermissionRequest } from '@bsv/wallet-toolbox-client'
 import { useTheme } from '@mui/material/styles'
 import Avatar from '@mui/material/Avatar'
@@ -12,6 +12,7 @@ import VerifiedUserIcon from '@mui/icons-material/VerifiedUser'
 import CodeIcon from '@mui/icons-material/Code'
 import CachedIcon from '@mui/icons-material/Cached'
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket'
+import deterministicColor from '../../utils/deterministicColor'
 
 // Permission request types
 type PermissionType = 'identity' | 'protocol' | 'renewal' | 'basket';
@@ -146,25 +147,25 @@ const ProtocolPermissionHandler: React.FC<{
     identity: {
       title: 'Trusted Entities Access Request',
       description: 'An app is requesting access to lookup identity information using the entities you trust.',
-      color: theme.palette.info.main,
+      color: theme.approvals.identity,
       icon: <VerifiedUserIcon fontSize="medium" />
     },
     renewal: {
       title: 'Protocol Access Renewal',
       description: 'An app is requesting to renew its previous access to a protocol using your information.',
-      color: theme.palette.success.main,
+      color: theme.approvals.renewal,
       icon: <CachedIcon fontSize="medium" />
     },
     basket: {
       title: 'Basket Access Request',
       description: 'An app is requesting access to a basket of your data to perform a specific task.',
-      color: theme.palette.warning.main,
+      color: theme.approvals.basket,
       icon: <ShoppingBasketIcon fontSize="medium" />
     },
     protocol: {
       title: 'Protocol Access Request',
       description: 'An app is requesting to talk in a specific language (protocol) using your information.',
-      color: theme.palette.primary.main,
+      color: theme.approvals.protocol,
       icon: <CodeIcon fontSize="medium" />
     }
   };
@@ -179,7 +180,7 @@ const ProtocolPermissionHandler: React.FC<{
   const getIconAvatar = () => (
     <Avatar 
       sx={{ 
-        bgcolor: deterministicColor(currentPerm.protocolID),
+        bgcolor: theme.approvals.protocol,
         width: 40,
         height: 40,
         display: 'flex',
@@ -204,7 +205,6 @@ const ProtocolPermissionHandler: React.FC<{
           gap: 2,
           p: 2,
           mb: 2,
-          borderLeft: `6px solid ${getPermissionTypeDoc().color}`,
           bgcolor: 'rgba(0, 0, 0, 0.02)'
         }}
       >
@@ -252,7 +252,7 @@ const ProtocolPermissionHandler: React.FC<{
           }}>
             <Typography variant="body1" fontWeight="bold">Protocol:</Typography>
             <ProtoChip
-              securityLevel={currentPerm.protocolSecurityLevel.toString()}
+              securityLevel={currentPerm.protocolSecurityLevel}
               protocolID={currentPerm.protocolID}
               counterparty={currentPerm.counterparty}
             />
@@ -276,6 +276,8 @@ const ProtocolPermissionHandler: React.FC<{
           )}
         </div>
       </DialogContent>
+
+      <Box sx={{ my:3, py: 1, background: deterministicColor(currentPerm.protocolID) }}/>
 
       <DialogActions>
         <Button 

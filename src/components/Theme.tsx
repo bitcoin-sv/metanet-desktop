@@ -133,6 +133,12 @@ export function AppThemeProvider({ children }: ThemeProps) {
     }
     
     return createTheme({
+      approvals: {
+        protocol: '#F7DC6F', // Amber
+        basket: '#FFC107', // Tangerine
+        identity: '#8BC34A', // Chartreuse
+        renewal: '#9C27B0' // Fuchsia
+      },
       palette: {
         mode,
         ...(mode === 'light' ? {

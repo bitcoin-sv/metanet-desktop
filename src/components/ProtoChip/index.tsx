@@ -20,7 +20,7 @@ const useStyles = makeStyles(style as any, {
 })
 
 interface ProtoChipProps extends RouteComponentProps {
-  securityLevel: string
+  securityLevel: number
   protocolID: string
   counterparty?: string
   lastAccessed?: string
@@ -85,6 +85,19 @@ const ProtoChip: React.FC<ProtoChipProps> = ({
   }
 
   const chipStyle = theme.templates.chip({ size, backgroundColor })
+
+  const securityLevelExplainer = (securityLevel: number) => {
+    switch (securityLevel) {
+      case 2:
+        return 'only with this app and counterparty'
+      case 1:
+        return 'only with this app'
+      case 0:
+        return 'in general'
+      default:
+        return 'Unknown security level'
+    }
+  }
 
   if (typeof protocolID !== 'string') {
     console.log('ProtoChip: protocolID must be a string. Received:', protocolID)
@@ -151,6 +164,9 @@ const ProtoChip: React.FC<ProtoChipProps> = ({
           Expires {expires}
         </div>
       )}
+      <div className={classes.securityLevel}>
+        {securityLevelExplainer(securityLevel)}
+      </div>
     </div>
   )
 }
