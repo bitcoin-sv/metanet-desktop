@@ -1,5 +1,6 @@
 import { Dispatch, SetStateAction, useState, useEffect, useContext } from 'react'
-import { DialogContent, DialogContentText, DialogActions, Button, Paper, Typography, Divider, Box } from '@mui/material'
+import { DialogContent, DialogActions, Button, Paper, Typography, Divider, Box, Stack, Tooltip } from '@mui/material'
+import Grid from '@mui/material/Grid2'
 import CustomDialog from '../CustomDialog/index'
 import { WalletContext } from '../../UserInterface'
 import AppChip from '../AppChip/index'
@@ -13,6 +14,7 @@ import CodeIcon from '@mui/icons-material/Code'
 import CachedIcon from '@mui/icons-material/Cached'
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket'
 import deterministicColor from '../../utils/deterministicColor'
+import InfoIcon from '@mui/icons-material/Info'
 
 // Permission request types
 type PermissionType = 'identity' | 'protocol' | 'renewal' | 'basket';
@@ -197,6 +199,7 @@ const ProtocolPermissionHandler: React.FC<{
       open={open}
       title={getPermissionTypeDoc().title}
     >
+      {/* Top section with icon and general description */}
       <Paper 
         elevation={0}
         sx={{
@@ -220,64 +223,73 @@ const ProtocolPermissionHandler: React.FC<{
       </Paper>
 
       <DialogContent>
-        <div style={{ 
-          display: 'grid', 
-          gap: theme.spacing(3),
-          maxWidth: '100%'
-        }}>
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'auto 1fr', 
-            alignItems: 'center', 
-            gap: theme.spacing(2) 
-          }}>
-            <Typography variant="body1" fontWeight="bold">App:</Typography>
-            {currentPerm.originator && 
-              <AppChip
-                size={2.5}
-                showDomain
-                label={currentPerm.originator}
-                clickable={false}
-              />
-            }
-          </div>
+        {/* Protocol description section - now prominently displayed at the top */}
+        {currentPerm.protocolID && (
+          <Paper 
+            elevation={0}
+            sx={{
+              p: 2,
+              mb: 3,
+              bgcolor: 'rgba(0, 0, 0, 0.03)',
+              borderLeft: `4px solid ${deterministicColor(currentPerm.protocolID)}`,
+            }}
+          >
+            <Typography variant="h6" gutterBottom>
+              {currentPerm.protocolID}
+            </Typography>
+            <Typography variant="body1">
+              {currentPerm.description || "No description provided for this protocol."}
+            </Typography>
+          </Paper>
+        )}
+
+        {/* Main content with app and protocol details */}
+        <Stack spacing={3}>
+          {/* App section */}
+          <Stack>
+            <Grid container spacing={2} alignItems="center">
+              <Grid flex="auto">
+                <Typography variant="body1" fontWeight="bold">App:</Typography>
+              </Grid>
+              <Grid flex={1}>
+                {currentPerm.originator && 
+                  <AppChip
+                    size={2.5}
+                    showDomain
+                    label={currentPerm.originator}
+                    clickable={false}
+                  />
+                }
+              </Grid>
+            </Grid>
+          </Stack>
 
           <Divider />
 
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'auto 1fr', 
-            alignItems: 'center', 
-            gap: theme.spacing(2)
-          }}>
-            <Typography variant="body1" fontWeight="bold">Protocol:</Typography>
-            <ProtoChip
-              securityLevel={currentPerm.protocolSecurityLevel}
-              protocolID={currentPerm.protocolID}
-              counterparty={currentPerm.counterparty}
-            />
-          </div>
-
-          {currentPerm.description && (
-            <>
-              <Divider />
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'auto 1fr', 
-                alignItems: 'start', 
-                gap: theme.spacing(2)
-              }}>
-                <Typography variant="body1" fontWeight="bold">Reason:</Typography>
-                <DialogContentText style={{ margin: 0 }}>
-                  {currentPerm.description}
-                </DialogContentText>
-              </div>
-            </>
-          )}
-        </div>
+          {/* Protocol section */}
+          <Stack>
+            <Grid container spacing={2} alignItems="center">
+              <Grid flex="auto">
+                <Typography variant="body1" fontWeight="bold">Protocol:</Typography>
+              </Grid>
+              <Grid flex={1}>
+                <ProtoChip
+                  securityLevel={currentPerm.protocolSecurityLevel}
+                  protocolID={currentPerm.protocolID}
+                  counterparty={currentPerm.counterparty}
+                />
+              </Grid>
+            </Grid>
+          </Stack>
+        </Stack>
       </DialogContent>
-
-      <Box sx={{ my:3, py: 1, background: deterministicColor(currentPerm.protocolID) }}/>
+      {/* 
+        This gradient of colors is just a visual cue to help the user realize that each request is different 
+        (sometimes several will pop up one after another and it feels like you're pressing "approve" on the same dialogue over and over again).
+      */}
+      <Tooltip title="Unique visual signature for this request" placement="top">
+        <Box sx={{ my:3, py: 0.5, background: deterministicColor(currentPerm.protocolID) }} />
+      </Tooltip>
 
       <DialogActions>
         <Button 
