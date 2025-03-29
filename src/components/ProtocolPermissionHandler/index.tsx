@@ -232,7 +232,7 @@ const ProtocolPermissionHandler: React.FC<{
         (sometimes several will pop up one after another and it feels like you're pressing "approve" on the same dialogue over and over again).
       */}
       <Tooltip title="Unique visual signature for this request" placement="top">
-        <Box sx={{ mb:3, py: 0.5, background: deterministicColor(currentPerm.protocolID) }} />
+        <Box sx={{ mb:3, py: 0.5, background: deterministicColor(JSON.stringify(currentPerm)) }} />
       </Tooltip>
 
       <DialogActions sx={{ justifyContent: 'space-between' }}>
