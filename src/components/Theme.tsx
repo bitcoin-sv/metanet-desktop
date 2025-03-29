@@ -134,10 +134,10 @@ export function AppThemeProvider({ children }: ThemeProps) {
     
     return createTheme({
       approvals: {
-        protocol: '#F7DC6F', // Amber
-        basket: '#FFC107', // Tangerine
-        identity: '#8BC34A', // Chartreuse
-        renewal: '#9C27B0' // Fuchsia
+        protocol: '#86c489',
+        basket: '#96c486',
+        identity: '#86a7c4',
+        renewal: '#ad86c4'
       },
       palette: {
         mode,
