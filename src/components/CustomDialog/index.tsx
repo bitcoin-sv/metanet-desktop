@@ -52,16 +52,11 @@ const CustomDialog: React.FC<CustomDialogProps> = ({
     >
       <DialogTitle component="div" className={classes.title} sx={{ backgroundColor: color, color: theme.palette.common.black }}>
         <Stack direction="row" spacing={1} alignItems="center">
-          {icon} <Typography variant="h6">{title}</Typography>
+          {icon} <Typography variant="h5" fontWeight="bold">{title}</Typography>
         </Stack>
       </DialogTitle>
-      <Box sx={{ px: 5, py: 3 }}>
-        {description && <Typography variant="body1" color="textSecondary">{description}</Typography>}
-      </Box>
-      <DialogContent className={classes.content}>
-        {children}
-      </DialogContent>
-
+      {description && <Box sx={{ px: 5, py: 3 }}><Typography variant="body1" color="textSecondary">{description}</Typography></Box>}
+      <DialogContent>{children}</DialogContent>
       {actions && (
         <DialogActions className={classes.actions}>
           {actions}

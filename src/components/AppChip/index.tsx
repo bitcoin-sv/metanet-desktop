@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Chip, Badge, Tooltip, Avatar } from '@mui/material'
+import { Chip, Badge, Tooltip, Avatar, Stack, Typography } from '@mui/material'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 import boomerang from 'boomerang-http'
 import isImageUrl from '../../utils/isImageUrl'
@@ -107,11 +107,15 @@ const AppChip: React.FC<AppChipProps> = ({
   }
 
   return (
-    <div className={classes.chipContainer}>
-      <Chip
-        style={(theme as any).templates.chip({ size, backgroundColor })}
-        label={
-          (showDomain && label !== parsedLabel)
+    <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between" sx={{
+      height: '3em', width: '100%'
+    }}>
+      <Typography variant="body1" fontWeight="bold">App:</Typography>
+        <div className={classes.chipContainer}>
+        <Chip
+          style={(theme as any).templates.chip({ size, backgroundColor })}
+          label={
+            (showDomain && label !== parsedLabel)
             ? <div style={{
               textAlign: 'left'
             }}>
@@ -215,6 +219,7 @@ const AppChip: React.FC<AppChipProps> = ({
       />
       <span className={classes.expiryHoverText}>{expires}</span>
     </div>
+    </Stack>
   )
 }
 

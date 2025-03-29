@@ -140,6 +140,7 @@ const ProtocolPermissionHandler: React.FC<{
 
   // Get the current permission request
   const currentPerm = perms[0]
+  console.log({ currentPerm })
   if (!currentPerm) {
     return null
   }
@@ -200,37 +201,30 @@ const ProtocolPermissionHandler: React.FC<{
       color={getPermissionTypeDoc().color}
       icon={getPermissionTypeDoc().icon}
     >
-      
-
       <DialogContent>
         {/* Main content with app and protocol details */}
-        <Stack spacing={3}>
+        <Stack spacing={1}>
           {/* App section */}
           {currentPerm.description && <Stack>
             {currentPerm.description}
           </Stack>}
-          <Stack direction="row" spacing={1} alignItems="center">
-            <Typography variant="body1" fontWeight="bold">App:</Typography>
-            <AppChip
-              size={2}
-              showDomain
-              label={currentPerm.originator || 'unknown'}
-              clickable={false}
-            />
-            <Typography variant="body1" fontWeight="bold">
-              wants to use
-            </Typography>
-          </Stack>
+
+          <AppChip
+            size={1.5}
+            showDomain
+            label={currentPerm.originator || 'unknown'}
+            clickable={false}
+          />
         
           <Divider />
-          <Stack direction="row" spacing={1} alignItems="center">
-            <Typography variant="body1" fontWeight="bold">Protocol:</Typography>
-            <ProtoChip
-              securityLevel={currentPerm.protocolSecurityLevel}
-              protocolID={currentPerm.protocolID}
-              counterparty={currentPerm.counterparty}
-            />
-          </Stack>
+
+          <ProtoChip
+            size={1.5}
+            securityLevel={currentPerm.protocolSecurityLevel}
+            protocolID={currentPerm.protocolID}
+            counterparty={currentPerm.counterparty}
+            description={currentPerm.description}
+          />
         </Stack>
       </DialogContent>
       {/* 
@@ -238,10 +232,10 @@ const ProtocolPermissionHandler: React.FC<{
         (sometimes several will pop up one after another and it feels like you're pressing "approve" on the same dialogue over and over again).
       */}
       <Tooltip title="Unique visual signature for this request" placement="top">
-        <Box sx={{ my:3, py: 0.5, background: deterministicColor(currentPerm.protocolID) }} />
+        <Box sx={{ mb:3, py: 0.5, background: deterministicColor(currentPerm.protocolID) }} />
       </Tooltip>
 
-      <DialogActions>
+      <DialogActions sx={{ justifyContent: 'space-between' }}>
         <Button 
           onClick={handleCancel}
           variant="outlined"

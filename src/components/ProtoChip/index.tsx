@@ -1,14 +1,12 @@
 import { useState, useEffect } from 'react'
-import { Chip, Badge, Tooltip, Avatar, Stack } from '@mui/material'
+import { Chip, Avatar, Stack, Typography, Divider } from '@mui/material'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 import CloseIcon from '@mui/icons-material/Close'
-import DataObject from '@mui/icons-material/DataObject'
 import makeStyles from '@mui/styles/makeStyles'
 import { useTheme } from '@mui/styles'
 import style from './style'
 import { deterministicImage } from '../../utils/deterministicImage'
 import CounterpartyChip from '../CounterpartyChip/index'
-import PlaceholderAvatar from '../PlaceholderAvatar'
 
 const useStyles = makeStyles(style as any, {
   name: 'ProtoChip'
@@ -109,72 +107,55 @@ const ProtoChip: React.FC<ProtoChipProps> = ({
   }
 
   return (
-    <Stack direction="row" alignItems="center" spacing={3}>
-      <Chip
-        style={theme.templates.chip({ size, backgroundColor })}
-        avatar={
-          <Badge
-            overlap="circular"
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-            badgeContent={
-              <Tooltip
-                arrow
-                title="Protocol (click to learn more)"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  window.open(documentationURL, '_blank')
-                }}
-              >
-                <Avatar
-                  sx={{
-                    width: 22,
-                    height: 22,
-                    bgcolor: theme.palette.primary.main,
-                    color: theme.palette.primary.contrastText
-                  }}
-                >
-                  <DataObject fontSize="small" />
-                </Avatar>
-              </Tooltip>
-            }
-          >
-            {!imageError ? (
-              <Avatar
-                src={iconURLState}
-                alt={protocolName}
-                sx={{ 
-                  width: size * 32, 
-                  height: size * 32,
-                  borderRadius: '4px',
-                  marginRight: '0.5em'
-                }}
-                onLoad={handleImageLoad}
-                onError={handleImageError}
-              />
-            ) : (
-              <PlaceholderAvatar
-                name={protocolName}
-                size={size * 32}
-                variant="square"
-                sx={{ borderRadius: '4px', marginRight: '0.5em' }}
-              />
-            )}
-          </Badge>
-        }
-        label={protocolName}
-        onClick={navToProtocolDocumentation}
-        onDelete={canRevoke ? onCloseClick : undefined}
-        deleteIcon={canRevoke ? <CloseIcon /> : undefined}
-      />
-      {counterparty && <CounterpartyChip
-        size={size * 0.8}
-        counterparty={counterparty}
+    <Stack direction="column" spacing={1} alignItems="space-between">
+      <Stack direction="row" alignItems="center" spacing={1} justifyContent="space-between" sx={{
+        height: '3em', width: '100%'
+      }}>
+        <Typography variant="body1" fontWeight="bold">Protocol:</Typography>
+        <Chip
+          style={theme.templates.chip({ size, backgroundColor })}
+          icon={
+            <Avatar
+              src={iconURLState}
+              alt={protocolName}
+              sx={{ 
+                  width: '2.5em',
+                  height: '2.5em',
+              }}
+              onLoad={handleImageLoad}
+              onError={handleImageError}
+            />
+          }
+          label={
+            <div style={(theme as any).templates.chipLabel}>
+              <span style={(theme as any).templates.chipLabelTitle({ size })}>
+                {protocolID}
+              </span>
+            </div>
+          }
+          onClick={navToProtocolDocumentation}
+          onDelete={canRevoke ? onCloseClick : undefined}
+          deleteIcon={canRevoke ? <CloseIcon /> : undefined}
+        />
+      </Stack>
+      {(counterparty && securityLevel > 1) && <CounterpartyChip
+          counterparty={counterparty}
       />}
-      {expires && (
-        <Stack>{expires}</Stack>
-      )}
-      <Stack>
-        {securityLevelExplainer(securityLevel)}
+      {expires && 
+      <>
+        <Divider />
+        <Stack sx={{
+          height: '3em', width: '100%'
+        }}>
+          {expires}
+        </Stack>
+      </>}
+      <Divider />
+      <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between" sx={{
+        height: '3em', width: '100%'
+      }}>
+        <Typography variant="body1" fontWeight="bold">Scope:</Typography>
+        <Typography variant="body1" sx={{ fontSize: '1rem' }}>{description && `${description} -`}{securityLevelExplainer(securityLevel)}</Typography>
       </Stack>
     </Stack>
   )
