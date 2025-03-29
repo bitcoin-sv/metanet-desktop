@@ -133,6 +133,12 @@ export function AppThemeProvider({ children }: ThemeProps) {
     }
     
     return createTheme({
+      approvals: {
+        protocol: '#86c489',
+        basket: '#96c486',
+        identity: '#86a7c4',
+        renewal: '#ad86c4'
+      },
       palette: {
         mode,
         ...(mode === 'light' ? {

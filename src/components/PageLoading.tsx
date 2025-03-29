@@ -6,5 +6,5 @@ export default () => <div style={{
   display: 'grid',
   placeItems: 'center'
 }}>
-  <AppLogo rotate size={100} />
+  <AppLogo rotate size={128} />
 </div>
