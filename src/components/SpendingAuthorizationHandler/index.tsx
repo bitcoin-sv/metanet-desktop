@@ -1,55 +1,55 @@
-import { Dispatch, SetStateAction, useState, useEffect, useContext } from 'react'
+import { useContext, useState, useEffect, useCallback } from 'react'
 import {
   DialogContent,
-  Typography,
-  Fab,
-  Tooltip,
+  Button,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Paper
+  Paper,
+  Box,
+  Stack
 } from '@mui/material'
-import makeStyles from '@mui/styles/makeStyles'
-import style from './style.js'
-import AmountDisplay from '../AmountDisplay/index.js'
 import { Send, Cancel } from '@mui/icons-material'
+import AmountDisplay from '../AmountDisplay/index.js'
 import CustomDialog from '../CustomDialog/index.js'
-import { WalletContext } from '../../UserInterface.js'
+import { WalletContext } from '../../WalletContext'
 import AppChip from '../AppChip/index.js'
-import { PermissionEventHandler, PermissionRequest, Services } from '@bsv/wallet-toolbox-client'
+import { Services } from '@bsv/wallet-toolbox-client'
+import { UserContext } from '../../UserContext.js'
 
 const services = new Services('main')
 
-const useStyles = makeStyles(style, {
-  name: 'SpendingAuthorizationHandler'
-})
-
-const SpendingAuthorizationHandler: React.FC<{
-  setSpendingAuthorizationCallback: Dispatch<SetStateAction<PermissionEventHandler>>
-}> = ({ setSpendingAuthorizationCallback }) => {
+const SpendingAuthorizationHandler: React.FC = () => {
   const {
-    onFocusRequested,
-    onFocusRelinquished,
-    isFocused,
-    managers
+    managers, spendingRequests, advanceSpendingQueue
   } = useContext(WalletContext)
-  const [usdPerBsv, setUsdPerBSV] = useState(70)
-  const [wasOriginallyFocused, setWasOriginallyFocused] = useState(false)
-  const [open, setOpen] = useState(false)
-  const [perms, setPerms] = useState<Array<any>>([
-    // originator
-    // requestID
-    // lineItems
-    // renewal
-    // transactionAmount
-    // amountPreviouslyAuthorized
-  ])
-  const classes = useStyles()
+  
+  const { spendingAuthorizationModalOpen } = useContext(UserContext)
+  
+  const [usdPerBsv, setUsdPerBSV] = useState(35)
 
-  // Helper function to figure out the upgrade amount (note: consider moving to utils)
+  const handleCancel = () => {
+    if (spendingRequests.length > 0) {
+      managers.permissionsManager!.denyPermission(spendingRequests[0].requestID)
+    }
+    advanceSpendingQueue()
+  }
+
+  const handleGrant = async ({ singular = true, amount }: { singular?: boolean, amount?: number }) => {
+    if (spendingRequests.length > 0) {
+      managers.permissionsManager!.grantPermission({
+        requestID: spendingRequests[0].requestID,
+        ephemeral: singular,
+        amount
+      })
+    }
+    advanceSpendingQueue()
+  }
+
+    // Helper function to figure out the upgrade amount (note: consider moving to utils)
   const determineUpgradeAmount = (previousAmountInSats: any, returnType = 'sats') => {
     let usdAmount
     const previousAmountInUsd = previousAmountInSats * (usdPerBsv / 100000000)
@@ -71,127 +71,66 @@ const SpendingAuthorizationHandler: React.FC<{
     return usdAmount
   }
 
-  const handleCancel = () => {
-    managers.permissionsManager!.denyPermission(perms[0].requestID)
-    setPerms(prev => {
-      const newPerms = prev.slice(1)
-      if (newPerms.length === 0) {
-        setOpen(false)
-        if (!wasOriginallyFocused) {
-          onFocusRelinquished()
-        }
-      }
-      return newPerms
-    })
-  }
-
-  const handleGrant = async ({ singular = true, amount }: { singular?: boolean, amount?: number }) => {
-    managers.permissionsManager!.grantPermission({
-      requestID: perms[0].requestID,
-      ephemeral: singular,
-      amount
-    })
-    setPerms(prev => {
-      const newPerms = prev.slice(1)  // copy all but the first element
-      if (newPerms.length === 0) {
-        setOpen(false)
-        if (!wasOriginallyFocused) {
-          onFocusRelinquished()
-        }
-      }
-      return newPerms
-    })
-  }
-
   useEffect(() => {
-    setSpendingAuthorizationCallback(() => {
-      return async (args: PermissionRequest & { requestID: string }): Promise<void> => {
-        const {
-          requestID,
-          originator,
-          reason,
-          renewal,
-          spending
-        } = args
-        let {
-          satoshis,
-          lineItems
-        } = spending!
-        if (!lineItems) {
-          lineItems = []
-        }
-
-        // TODO: support these
-        const transactionAmount = 0
-        const totalPastSpending = 0
-        const amountPreviouslyAuthorized = 0
-
-        setOpen(true)
-        const wasOriginallyFocused = await isFocused()
-        if (!wasOriginallyFocused) {
-          await onFocusRequested()
-        }
-        if (perms.length === 0) {
-          setWasOriginallyFocused(wasOriginallyFocused)
-        }
-        setPerms(p => {
-          const newItem = {
-            requestID,
-            originator,
-            description: reason,
-            transactionAmount,
-            totalPastSpending,
-            amountPreviouslyAuthorized,
-            authorizationAmount: satoshis,
-            renewal,
-            lineItems
-          }
-          return [...p, newItem]
-        })
-        const rate = await services.getBsvExchangeRate()
+    // Fetch exchange rate when we have spending requests
+    if (spendingRequests.length > 0) {
+      services.getBsvExchangeRate().then(rate => {
         setUsdPerBSV(rate)
-      }
-    })
-  }, [])
+      })
+    }
+  }, [spendingRequests])
 
-  if (typeof perms[0] === 'undefined') {
+  if (spendingRequests.length === 0) {
     return null
   }
 
+  // Get the current permission request
+  const currentPerm = spendingRequests[0]
+
   return (
     <CustomDialog
-      open={open}
-      title={!perms[0].renewal ? 'Spending Request' : 'Spending Check-in'}
+      open={spendingAuthorizationModalOpen}
+      title={!currentPerm.renewal ? 'Spending Request' : 'Spending Check-in'}
     >
       <DialogContent>
-        <br />
-        <center>
+        <Stack alignItems="center">
           <AppChip
             size={2.5}
-            label={perms[0].originator}
+            label={currentPerm.originator}
             clickable={false}
             showDomain
           />
-          <br />
-          <br />
-        </center>
-        <Typography align='center'>
-          would like to spend
-        </Typography>
-        <Typography variant='h3' align='center' paragraph color='textPrimary'>
-          <AmountDisplay >{perms[0].transactionAmount}</AmountDisplay>
-        </Typography>
-
-        <Typography align='center'>
-          <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 250 }} aria-label='simple table' size='small'>
+          <Box mt={2} />
+          <TableContainer 
+            component={Paper} 
+            sx={{ 
+              overflow: 'hidden',
+              my: 3,
+              width: '100%'
+            }}
+          >
+            <Table 
+              sx={{ 
+                width: '100%',
+                '& th, & td': { 
+                  px: 3,
+                  py: 1.5
+                }
+              }} 
+              aria-label='spending details table' 
+              size='medium'
+            >
               <TableHead>
                 <TableRow
                   sx={{
-                    borderBottom: '2px solid black',
+                    color: 'text.primary',
                     '& th': {
-                      fontSize: '14px',
-                      fontWeight: 'bold'
+                      fontSize: '0.875rem',
+                      fontWeight: 600,
+                      color: 'text.primary',
+                      letterSpacing: '0.01em',
+                      borderBottom: '1px solid',
+                      borderColor: 'primary.light',
                     }
                   }}
                 >
@@ -200,58 +139,112 @@ const SpendingAuthorizationHandler: React.FC<{
                 </TableRow>
               </TableHead>
               <TableBody>
-                {perms[0].lineItems.map((row: any) => (
+                {currentPerm.lineItems.map((item, idx) => (
                   <TableRow
-                    key={row.description}
-                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                    key={`item-${idx}-${item.description || 'unnamed'}`}
+                    sx={{ 
+                      '&:last-child td, &:last-child th': { 
+                        border: 0 
+                      },
+                      '&:nth-of-type(odd)': { 
+                        bgcolor: 'background.default' 
+                      },
+                      transition: 'background-color 0.2s ease',
+                      '&:hover': {
+                        bgcolor: 'action.hover',
+                      }
+                    }}
                   >
-                    <TableCell component='th' scope='row'>
-                      {row.description}
+                    <TableCell 
+                      component='th' 
+                      scope='row'
+                      sx={{
+                        fontWeight: 500,
+                        color: 'text.primary'
+                      }}
+                    >
+                      {item.description || '—'}
                     </TableCell>
-                    <TableCell align='right'> <AmountDisplay showPlus abbreviate>{row.satoshis}</AmountDisplay></TableCell>
+                    <TableCell 
+                      align='right'
+                      sx={{
+                        fontWeight: 600,
+                        color: 'secondary.main'
+                      }}
+                    >
+                      <AmountDisplay>
+                        {item.satoshis}
+                      </AmountDisplay>
+                    </TableCell>
                   </TableRow>
                 ))}
-                <TableRow
-                  sx={{ '&:last-child td, &:last-child th': { border: 0, fontWeight: 'bold' } }}
-                >
-                  <TableCell component='th' scope='row'>
-                    <b>Total</b>
-                  </TableCell>
-                  <TableCell align='right'><AmountDisplay showPlus abbreviate>{perms[0].transactionAmount * -1}</AmountDisplay></TableCell>
-                </TableRow>
+                {/* Show total row if there are multiple items */}
+                {currentPerm.lineItems.length > 1 && (
+                  <TableRow
+                    sx={{ 
+                      bgcolor: 'primary.light',
+                      '& td': {
+                        py: 2,
+                        fontWeight: 700,
+                        color: 'primary.contrastText',
+                        borderTop: '1px solid',
+                        borderColor: 'divider'
+                      }
+                    }}
+                  >
+                    <TableCell>Total</TableCell>
+                    <TableCell align="right">
+                      <AmountDisplay>
+                        {currentPerm.authorizationAmount}
+                      </AmountDisplay>
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </TableContainer>
-        </Typography>
-
-        <div className={classes.fabs_wrap}>
-          <Tooltip title='Deny Permission'>
-            <Fab
-              color='secondary'
-              onClick={handleCancel}
-              variant='extended'
-            >
-              <Cancel className={classes.button_icon} />
-              Deny
-            </Fab>
-          </Tooltip>
-          <Fab
-            variant='extended'
-            onClick={() => handleGrant({ singular: false, amount: determineUpgradeAmount(perms[0].amountPreviouslyAuthorized) })}
+        </Stack>
+        
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          mt: 3,
+          px: 2
+        }}>
+          <Button
+            variant="outlined"
+            color="error"
+            onClick={handleCancel}
+            sx={{
+              height: '40px'
+            }}
           >
-            Allow up to &nbsp;<AmountDisplay showFiatAsInteger>{determineUpgradeAmount(perms[0].amountPreviouslyAuthorized)}</AmountDisplay>
-          </Fab>
-          <Tooltip title='Allow Once'>
-            <Fab
-              color='primary'
-              onClick={() => handleGrant({ singular: true })}
-              variant='extended'
-            >
-              <Send className={classes.button_icon} />
-              Allow
-            </Fab>
-          </Tooltip>
-        </div>
+            Deny
+          </Button>
+
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={() => handleGrant({ singular: false, amount: determineUpgradeAmount(currentPerm.amountPreviouslyAuthorized) })}
+            sx={{ 
+              minWidth: '120px',
+              height: '40px'
+            }}
+          >
+            Allow up to &nbsp;<AmountDisplay showFiatAsInteger>{determineUpgradeAmount(currentPerm.amountPreviouslyAuthorized)}</AmountDisplay>
+          </Button>
+          
+          <Button
+            variant="contained"
+            color="success"
+            onClick={() => handleGrant({ singular: true })}
+            sx={{ 
+              height: '40px'
+            }}
+          >
+            Spend
+          </Button>
+        </Box>
       </DialogContent>
     </CustomDialog>
   )

@@ -50,6 +50,7 @@ const AppAccess = ({ match, history }) => {
     }
   }, [appDomain, originator, DEFAULT_APP_ICON, setLoading, setRefresh, setAppIcon, setAppName])
 
+  const url = appDomain.startsWith('http') ? appDomain : `https://${appDomain}`
 
   return (
     <div>
@@ -60,14 +61,14 @@ const AppAccess = ({ match, history }) => {
             subheading={
               <div>
                 <Typography variant='caption' color='textSecondary'>
-                  {`https://${appDomain}`}
-                  <IconButton size='small' onClick={() => handleCopy(appDomain, 'id')} disabled={copied.id}>
+                  {url}
+                  <IconButton size='small' onClick={() => handleCopy(url, 'id')} disabled={copied.id}>
                     {copied.id ? <CheckIcon /> : <ContentCopyIcon fontSize='small' />}
                   </IconButton>
                 </Typography>
               </div>
             } icon={appIcon} buttonTitle='Launch' onClick={() => {
-              window.open(`https://${appDomain}`, '_blank')
+              window.open(url, '_blank')
             }}
           />
         </Grid>
@@ -108,7 +109,7 @@ const AppAccess = ({ match, history }) => {
       </Tabs>
       {tabValue === '0' &&
         <ProtocolPermissionList
-          app={appDomain}
+          app={url}
           canRevoke
           showEmptyList
         />}

@@ -44,7 +44,7 @@ async function fetchAndCacheAppData(
   try {
     const manifest: AppManifest | null = await parseAppManifest({ domain: appDomain });
     if (manifest) {
-      const faviconUrl = `https://${appDomain}/favicon.ico`;
+      const faviconUrl = appDomain.startsWith('http') ? appDomain : `https://${appDomain}/favicon.ico`;
       const isValidImage = await isImageUrl(faviconUrl);
 
       if (isValidImage) {

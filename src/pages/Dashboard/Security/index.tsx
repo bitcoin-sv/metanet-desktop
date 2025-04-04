@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { makeStyles } from '@mui/styles'
 import { Theme } from '@mui/material/styles'
 import { 
@@ -14,6 +14,8 @@ import {
 import { useHistory } from 'react-router-dom'
 import ChangePassword from '../Settings/Password'
 import RecoveryKey from '../Settings/RecoveryKey'
+import { UserContext } from '../../../UserContext'
+import PageLoading from '../../../components/PageLoading.js'
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -41,6 +43,7 @@ const Security: React.FC = () => {
   const history = useHistory()
   const [showKeyDialog, setShowKeyDialog] = useState(false)
   const [recoveryKey, setRecoveryKey] = useState('')
+  const { pageLoaded } = useContext(UserContext)
 
   const handleViewKey = (key: string) => {
     setRecoveryKey(key)
@@ -50,6 +53,10 @@ const Security: React.FC = () => {
   const handleCloseDialog = () => {
     setShowKeyDialog(false)
     setRecoveryKey('')
+  }
+
+  if (!pageLoaded) {
+    return <PageLoading />
   }
 
   return (

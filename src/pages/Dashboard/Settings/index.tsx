@@ -10,11 +10,13 @@ import {
 import Grid from '@mui/material/Grid2' 
 import { makeStyles } from '@mui/styles'
 import { toast } from 'react-toastify'
-import { WalletContext } from '../../../UserInterface.js'
+import { WalletContext } from '../../../WalletContext'
 import { Theme } from '@mui/material/styles'
 import DarkModeImage from "../../../images/darkMode.jsx"
 import LightModeImage from "../../../images/lightMode.jsx"
 import ComputerIcon from '@mui/icons-material/Computer'
+import { UserContext } from '../../../UserContext'
+import PageLoading from '../../../components/PageLoading.js'
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -61,6 +63,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 const Settings = () => {
   const classes = useStyles()
   const { settings, updateSettings } = useContext(WalletContext)
+  const { pageLoaded } = useContext(UserContext)
   const [settingsLoading, setSettingsLoading] = useState(false)
   const theme = useTheme()
   const isDarkMode = theme.palette.mode === 'dark'
@@ -188,6 +191,10 @@ const Settings = () => {
       boxShadow: 3,
     };
   };
+
+  if (!pageLoaded) {
+    return <PageLoading />
+  }
 
   return (
     <div className={classes.root}>

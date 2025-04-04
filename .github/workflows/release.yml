@@ -178,10 +178,28 @@ jobs:
       #   if: matrix.platform == 'windows-latest'
       #   run: |
       #     signtool verify /pa /v path\to\metanet-desktop-setup.exe
+      
+      - name: List Windows build artifacts for debugging
+        if: matrix.platform == 'windows-latest'
+        shell: powershell
+        run: |
+          Write-Host "Checking build directory structure:"
+          Get-ChildItem -Path src-tauri\target\release -Recurse | Where-Object { $_.Name -like "*.exe" } | ForEach-Object { $_.FullName }
 
-      - name: Upload Windows Artifact
+      - name: Upload Windows Artifact - MSI
         if: matrix.platform == 'windows-latest'
         uses: actions/upload-artifact@v4
         with:
-          name: windows-artifact
-          path: src-tauri/target/release/bundle/windows/*.exe
+          name: windows-msi-artifact
+          path: src-tauri/target/release/bundle/msi/*.msi
+          if-no-files-found: warn
+
+      - name: Upload Windows Artifact - EXE
+        if: matrix.platform == 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-exe-artifact
+          path: |
+            src-tauri/target/release/bundle/nsis/*.exe
+            src-tauri/target/release/bundle/nsis-web/*.exe
+          if-no-files-found: warn

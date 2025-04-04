@@ -39,8 +39,9 @@ const AddEntityModal = ({
       setLoading(true)
       const controller = new window.AbortController()
       const id = setTimeout(() => controller.abort(), 15000)
+      const url = domain.startsWith('http') ? `${domain}/manifest.json` : `https://${domain}/manifest.json`
       const result = await window.fetch(
-        `https://${domain}/manifest.json`,
+        url,
         { signal: controller.signal }
       )
       clearTimeout(id)

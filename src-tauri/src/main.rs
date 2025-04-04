@@ -16,12 +16,12 @@ use std::{
 // Third-party imports.
 use dashmap::DashMap;
 use hyper::{
-    Body, Request, Response, Server, StatusCode,
     service::{make_service_fn, service_fn},
+    Body, Request, Response, Server, StatusCode,
 };
 use serde::{Deserialize, Serialize};
+use tauri::{Emitter, Listener, Manager, Window};
 use tokio::sync::oneshot;
-use tauri::{Manager, Listener, Emitter, Window};
 
 static MAIN_WINDOW_NAME: &str = "main";
 
