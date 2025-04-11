@@ -99,6 +99,12 @@ const Apps: React.FC = () => {
     appDomains: string[]
   }): Promise<AppData[]> => {
     const dataPromises = appDomains.map(async domain => {
+      if (domain.startsWith('https://')) {
+        domain = domain.substring(8)
+      }
+      if (domain.startsWith('http://')) {
+        domain = domain.substring(7)
+      }
       let appIconImageUrl: string | undefined
       let appName: string = domain
 
