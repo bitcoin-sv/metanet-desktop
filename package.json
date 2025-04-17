@@ -11,9 +11,9 @@
     "release-version": "node update-version.js"
   },
   "dependencies": {
-    "@bsv/sdk": "^1.4.18",
-    "@bsv/uhrp-react": "^1.0.1",
-    "@bsv/wallet-toolbox-client": "^1.2.35",
+    "@bsv/brc100-ui-react-components": "^0.1.2",
+    "@bsv/sdk": "^1.4.19",
+    "@bsv/wallet-toolbox-client": "^1.2.39",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^6.4.3",
@@ -22,19 +22,16 @@
     "@tauri-apps/api": "^2.4.1",
     "@tauri-apps/plugin-dialog": "^2.2.1",
     "@tauri-apps/plugin-shell": "^2.2.1",
-    "boomerang-http": "^0.1.0",
     "date-fns": "^4.1.0",
     "fuse.js": "^7.1.0",
     "iso-3166-ts": "^2.2.0",
     "jdenticon": "^3.3.0",
+    "libphonenumber-js": "^1.12.6",
     "react": "^18.3.1",
-    "react-country-region-selector": "^4.0.2",
     "react-dom": "^18.3.1",
-    "react-phone-number-input": "^3.4.11",
-    "react-router": "^5.2.0",
+    "react-phone-number-input": "^3.4.12",
     "react-router-dom": "^5.2.0",
-    "react-toastify": "^11.0.3",
-    "react-visibility-sensor": "^5.1.1"
+    "react-toastify": "^11.0.3"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.4.0",
@@ -42,7 +39,6 @@
     "@types/node": "^22.13.1",
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.1",
-    "@types/react-router-dom": "^5.3.3",
     "@vitejs/plugin-react": "^4.3.4",
     "fs": "^0.0.1-security",
     "path": "^0.12.7",

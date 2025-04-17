@@ -13,13 +13,24 @@
     "windows": [
       {
         "title": "Metanet Desktop",
-        "width": 1620,
-        "height": 1000
+        "width": 480,
+        "height": 600,
+        "visible": false,
+        "decorations": true,
+        "transparent": false,
+        "skipTaskbar": true,
+        "alwaysOnTop": true,
+        "center": false
       }
     ],
     "security": {
       "csp": null
-    }
+    },
+    "trayIcon": {
+      "iconPath": "icons/icon.png",
+      "iconAsTemplate": true
+    },
+    "macOSPrivateApi": true
   },
   "plugins": {
     "opener": null
