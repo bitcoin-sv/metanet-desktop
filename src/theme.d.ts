@@ -1,4 +1,5 @@
 import '@mui/material/styles';
+import React from 'react';
 
 declare module '@mui/material/styles' {
   interface Theme {
@@ -7,6 +8,9 @@ declare module '@mui/material/styles' {
       basket: string;
       identity: string;
       renewal: string;
+    };
+    templates: {
+      page_wrap: React.CSSProperties;
     };
   }
   
@@ -17,6 +21,9 @@ declare module '@mui/material/styles' {
       basket?: string;
       identity?: string;
       renewal?: string;
+    };
+    templates?: {
+      page_wrap?: React.CSSProperties;
     };
   }
 }

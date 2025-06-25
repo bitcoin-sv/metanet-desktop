@@ -554,10 +554,7 @@
                     break;
                 case 'linux':
                     assetFilter = asset =>
-                        asset.name.includes('.AppImage') ||
-                        asset.name.toLowerCase().includes('linux') ||
-                        asset.name.includes('.deb') ||
-                        asset.name.includes('.rpm');
+                        asset.name.includes('.AppImage');
                     break;
                 default:
                     return null;
