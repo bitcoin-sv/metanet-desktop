@@ -13,7 +13,7 @@
   "dependencies": {
     "@bsv/brc100-ui-react-components": "^0.1.12",
     "@bsv/sdk": "^1.6.5",
-    "@bsv/wallet-toolbox-client": "^1.4.5",
+    "@bsv/wallet-toolbox-client": "^1.4.8",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^6.4.3",
