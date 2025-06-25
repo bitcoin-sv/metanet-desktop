@@ -26,9 +26,9 @@ export default defineConfig({
       : undefined,
     watch: {
       ignored: ["**/src-tauri/**"],
-      // (optional) if you ever see missed updates on macOS:
-      // usePolling: true,
-      // interval: 100
+      // Watch the linked package for changes
+      usePolling: true,
+      interval: 100
     },
     fs: {
       allow: [
@@ -48,6 +48,6 @@ export default defineConfig({
   },
 
   optimizeDeps: {
-    include: ["@bsv/brc100-ui-react-components"],
+    exclude: ["@bsv/brc100-ui-react-components"], // Exclude from pre-bundling to ensure fresh builds
   },
 });
