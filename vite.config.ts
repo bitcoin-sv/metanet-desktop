@@ -31,23 +31,10 @@ export default defineConfig(async () => ({
     watch: {
       // 3. tell vite to ignore watching `src-tauri`
       ignored: ["**/src-tauri/**"],
-      // Watch the linked package for changes
-      usePolling: true,
-      interval: 100
-    },
-    fs: {
-      allow: [
-        path.resolve(__dirname),
-        linkedPackagePath
-      ],
     },
   },
   resolve: {
     extensions: [".mjs", ".js", ".ts", ".jsx", ".tsx", ".json"],
     preserveSymlinks: true
   },
-
-  optimizeDeps: {
-    exclude: ["@bsv/brc100-ui-react-components"], // Exclude from pre-bundling to ensure fresh builds
-  },
-});
+}));

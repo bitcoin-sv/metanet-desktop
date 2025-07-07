@@ -48,6 +48,6 @@ export default defineConfig({
   },
 
   optimizeDeps: {
-    include: ["@bsv/brc100-ui-react-components"],
+    exclude: ["@bsv/brc100-ui-react-components"],
   },
 });
