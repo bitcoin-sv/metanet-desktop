@@ -1,6 +1,6 @@
 [package]
 name = "metanet-desktop"
-version = "0.4.3"
+version = "0.5.0"
 description = "An example desktop wallet"
 authors = ["you"]
 edition = "2021"

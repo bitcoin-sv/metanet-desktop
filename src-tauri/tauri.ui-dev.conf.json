@@ -2,9 +2,9 @@
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "Metanet Desktop",
   "identifier": "com.metanet-desktop.app",
-  "version": "0.5.0",
+  "version": "0.4.3",
   "build": {
-    "beforeDevCommand": "npm run dev",
+    "beforeDevCommand": "npm run dev-ui",
     "devUrl": "http://localhost:1420",
     "beforeBuildCommand": "npm run build",
     "frontendDist": "../dist"
@@ -22,11 +22,9 @@
     }
   },
   "plugins": {
-    "shell": {
-      "open": true
-    },
     "opener": null,
-    "dialog": null
+    "dialog": null,
+    "shell": null
   },
   "bundle": {
     "active": true,

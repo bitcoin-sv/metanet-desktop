@@ -29,9 +29,33 @@ import { listen, emit } from '@tauri-apps/api/event'
 
 
 // Parse the origin header and turn it into a fqdn (e.g. projectbabbage.com:8080)
-function parseOrigin(origin: string): string {
-  return new URL(origin).host
+// Handles both origin and legacy originator headers
+function parseOrigin(req, headers: Record<string, string>): string {
+  const rawOrigin = headers['origin'];
+  const rawOriginator = headers['originator'];
+
+  // 1) Browser case
+  if (rawOrigin) {
+    return new URL(rawOrigin).host;
+  }
+
+  // 2) Node-injected fallback
+  if (rawOriginator) {
+    // Add scheme only if missing
+    const candidate = rawOriginator.includes('://')
+      ? rawOriginator
+      : `http://${rawOriginator}`;
+    return new URL(candidate).host;
+  }
+
+  emit('ts-response', {
+    request_id: req.request_id,
+    status: 400,
+    body: JSON.stringify({ message: 'Origin header is required' })
+  })
+  return
 }
+
 
 export const onWalletReady = async (wallet: WalletInterface): Promise<(() => void) | undefined> => {
   return await listen('http-request', async (event) => {
@@ -46,21 +70,7 @@ export const onWalletReady = async (wallet: WalletInterface): Promise<(() => voi
         ]
       })
       req.headers = Object.fromEntries(req.headers)
-
-      if (req.headers.originator && !req.headers.origin) {
-        req.headers.origin = req.headers.originator
-      }
-
-      if (!req.headers['origin']) {
-        emit('ts-response', {
-          request_id: req.request_id,
-          status: 400,
-          body: JSON.stringify({ message: 'Origin header is required' })
-        })
-        return
-      }
-
-      const origin = parseOrigin(req.headers['origin'])
+      const origin = parseOrigin(req, req.headers)
 
       switch (req.path) {
         // 1. createAction
